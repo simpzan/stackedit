@@ -38,64 +38,23 @@ define([
     ].join('');
 
     var panelElt;
-    var documentListElt;
-    var $documentListElt;
+    var $filterInputElt;
     var documentListFilteredElt;
     var $documentListFilteredElt;
     var selectedFileDesc;
     var refreshPanel = _.debounce(function() {
-
-        // List orphan documents
-        var orphanDocumentList = _.filter(fileSystem, function(fileDesc) {
-            return fileDesc.folder === undefined;
-        });
-
-        // Add orphan documents
-        var documentListHtml = _.chain(orphanDocumentList).sortBy(function(fileDesc) {
-            return fileDesc.title.toLowerCase();
+        var documentListFilteredHtml = _.values(fileSystem).sort(function(f1, f2) {
+            return f2.selectTime - f1.selectTime;
         }).reduce(function(result, fileDesc) {
             return result + '<li>' + _.template(documentEltTmpl, {
                 fileDesc: fileDesc,
                 selectedFileDesc: selectedFileDesc
             }) + '</li>';
-        }, '').value();
-        documentListHtml = documentListHtml && '<ul class="nav">' + documentListHtml + '</ul>';
-
-        // Build directories
-        _.chain(folderList).sortBy(function(folderDesc) {
-            return folderDesc.name.toLowerCase();
-        }).each(function(folderDesc) {
-            var fileListHtml = _.chain(folderDesc.fileList).sortBy(function(fileDesc) {
-                return fileDesc.title.toLowerCase();
-            }).reduce(function(result, fileDesc) {
-                return result + '<li>' + _.template(documentEltTmpl, {
-                    fileDesc: fileDesc,
-                    selectedFileDesc: selectedFileDesc
-                }) + '</li>';
-            }, '').value();
-            fileListHtml = fileListHtml && '<ul class="nav">' + fileListHtml + '</ul>';
-            documentListHtml += _.template(folderEltTmpl, {
-                folderDesc: folderDesc,
-                fileListHtml: fileListHtml,
-                id: folderDesc.folderIndex.replace('.', '')
-            });
-        });
-
-        documentListElt.innerHTML = documentListHtml;
-
-        // Create filtered list
-        var documentListFilteredHtml = _.chain(fileSystem).sortBy(function(fileDesc) {
-            return fileDesc.title.toLowerCase();
-        }).reduce(function(result, fileDesc) {
-            return result + '<li>' + _.template(documentEltTmpl, {
-                fileDesc: fileDesc,
-                selectedFileDesc: selectedFileDesc
-            }) + '</li>';
-        }, '').value();
+        }, '');
         documentListFilteredHtml = '<ul class="nav">' + documentListFilteredHtml + '</ul>';
-
         documentListFilteredElt.innerHTML = documentListFilteredHtml;
 
+        filterFiles($filterInputElt.val());
     }, 50);
 
     documentPanel.onFileSelected = function(fileDesc) {
@@ -112,58 +71,43 @@ define([
     documentPanel.onPublishRemoved = refreshPanel;
     documentPanel.onFoldersChanged = refreshPanel;
 
+    var filteredFiles = [];
     // Filter for search input in file selector
     var panelContentElt;
     var previousFilterValue = '';
     function filterFiles(filterValue) {
-        if(filterValue == previousFilterValue) {
-            return;
-        }
-        previousFilterValue = filterValue;
-
         // Scroll to top
         panelContentElt.scrollTop = 0;
 
-        if(!filterValue) {
-            $documentListFilteredElt.addClass('hide');
-            $documentListElt.removeClass('hide');
-            return;
-        }
         var wordList = filterValue.toLowerCase().split(/\s+/);
+        filteredFiles = _.values(fileSystem).sort(function(f1, f2) {
+            return f2.selectTime - f1.selectTime;
+        }).filter(file => {
+            var title = file.title.toLowerCase();
+            var titleMatched = wordList.every(word => title.indexOf(word) !== -1);
+            var content = file.content.toLowerCase();
+            var contentMatched = wordList.every(word => content.indexOf(word) !== -1);
+            return titleMatched || contentMatched;
+        });
+
         _.each(documentListFilteredElt.querySelectorAll('.file'), function(fileElt) {
             var $fileElt = $(fileElt);
-            var fileDesc = fileSystem[$fileElt.data('fileIndex')];
-            var fileTitle = $fileElt.text().toLowerCase();
-            var titleMatched = _.every(wordList, function(word) {
-                return fileTitle.indexOf(word) !== -1;
-            });
-            var fileContent = fileDesc.content.toLowerCase();
-            var contentMatched = _.every(wordList, function(word) {
-                return fileContent.indexOf(word) !== -1;
-            });
-            $fileElt.toggle(titleMatched || contentMatched);
+            var fileIndex = $fileElt.data('fileIndex');
+            var matched = filteredFiles.find(file => file.fileIndex === fileIndex);
+            $fileElt.toggle(!!matched);
         });
-        $documentListFilteredElt.removeClass('hide');
-        $documentListElt.addClass('hide');
     }
 
     documentPanel.onReady = function() {
         panelElt = document.querySelector('.document-panel');
         panelContentElt = panelElt.querySelector('.panel-content');
-        documentListElt = panelElt.querySelector('.document-list');
-        $documentListElt = $(documentListElt);
         documentListFilteredElt = panelElt.querySelector('.document-list-filtered');
         $documentListFilteredElt = $(documentListFilteredElt);
 
         // Open current folder before opening
-        $(panelElt).on('show.layout.toggle', function() {
-            var folderDesc = selectedFileDesc.folder;
-            if(folderDesc !== undefined) {
-                $(panelElt.querySelector('.file-list.' + folderDesc.folderIndex.replace('.', ''))).collapse('show');
-            }
-        }).on('shown.layout.toggle', function() {
+        $(panelElt).on('shown.layout.toggle', function() {
             // Scroll to the active file
-            var activeElt = documentListElt.querySelector('.file.active');
+            var activeElt = documentListFilteredElt.querySelector('.file.active');
             activeElt && (panelContentElt.scrollTop += activeElt.getBoundingClientRect().top - 240);
             $filterInputElt.focus();
         }).on('hidden.layout.toggle', function() {
@@ -179,12 +123,38 @@ define([
         });
 
         // Search bar input change
-        var $filterInputElt = $(panelElt.querySelector('.search-bar .form-control'));
+        $filterInputElt = $(panelElt.querySelector('.search-bar .form-control'));
         $filterInputElt.bind("propertychange keyup input paste", function() {
             filterFiles($filterInputElt.val());
         });
+        $filterInputElt.bind("keydown", function(event) {
+            var upKey = 38, downKey = 40, enterKey = 13, escKey = 27;
+            var keyCode = event.keyCode;
+            if (keyCode == upKey) {
+                selectNextFile(-1);
+            } else if (keyCode === downKey) {
+                selectNextFile(1);
+            } else if (keyCode === enterKey) {
+                fileMgr.selectFile(selectedFileDesc);
+            } else if (keyCode === escKey) {
+                // close the document panel.
+                return;
+            }
+            $filterInputElt.focus();
+        });
 
     };
+
+    function selectNextFile(direction) {
+        var current = filteredFiles.indexOf(selectedFileDesc);
+        var next = current === -1 ? 0 : current + direction;
+        var result = filteredFiles[next];
+        if (result) {
+            documentPanel.onFileSelected(result);
+        } else {
+            console.log("no file next");
+        }
+    }
 
     return documentPanel;
 
