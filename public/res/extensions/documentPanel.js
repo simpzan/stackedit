@@ -159,6 +159,7 @@ define([
             // Scroll to the active file
             var activeElt = documentListElt.querySelector('.file.active');
             activeElt && (panelContentElt.scrollTop += activeElt.getBoundingClientRect().top - 240);
+            $filterInputElt.focus();
         }).on('hidden.layout.toggle', function() {
             // Unset the filter
             $filterInputElt.val('');
