@@ -504,6 +504,10 @@ define([
 		mousetrap.bind('ctrl+p', function() {
 			documentPanel.toggle();
 		});
+		mousetrap.bind('esc', function() {
+			documentPanel.toggle(false);
+			menuPanel.toggle(false);
+		});
 
 		menuPanel.isOpen = false;
 		if(!window.viewerMode) {
@@ -599,7 +603,7 @@ define([
 
 		// Configure Mousetrap
 		mousetrap.stopCallback = function() {
-			return menuPanel.isOpen || isModalShown;
+			return isModalShown;
 		};
 
 		$(window).resize(resizeAll).focus(function() {

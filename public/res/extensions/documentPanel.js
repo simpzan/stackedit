@@ -128,7 +128,7 @@ define([
             filterFiles($filterInputElt.val());
         });
         $filterInputElt.bind("keydown", function(event) {
-            var upKey = 38, downKey = 40, enterKey = 13, escKey = 27;
+            var upKey = 38, downKey = 40, enterKey = 13;
             var keyCode = event.keyCode;
             if (keyCode == upKey) {
                 selectNextFile(-1);
@@ -136,9 +136,6 @@ define([
                 selectNextFile(1);
             } else if (keyCode === enterKey) {
                 fileMgr.selectFile(selectedFileDesc);
-            } else if (keyCode === escKey) {
-                // close the document panel.
-                return;
             }
             $filterInputElt.focus();
         });
