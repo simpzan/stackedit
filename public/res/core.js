@@ -523,8 +523,6 @@ define([
 			}, '');
 			document.getElementById('input-settings-theme').innerHTML = themeOptions;
 		}
-
-		$('.modal-header').append('<a class="dialog-header-message" href="http://classeur.io" target="_blank"><i class="icon-megaphone"></i> Try Classeur beta!</a>');
 	});
 
 	return core;
