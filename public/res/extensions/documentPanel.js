@@ -132,10 +132,16 @@ define([
         var wordList = filterValue.toLowerCase().split(/\s+/);
         _.each(documentListFilteredElt.querySelectorAll('.file'), function(fileElt) {
             var $fileElt = $(fileElt);
+            var fileDesc = fileSystem[$fileElt.data('fileIndex')];
             var fileTitle = $fileElt.text().toLowerCase();
-            $fileElt.toggle(!_.some(wordList, function(word) {
-                return fileTitle.indexOf(word) === -1;
-            }));
+            var titleMatched = _.every(wordList, function(word) {
+                return fileTitle.indexOf(word) !== -1;
+            });
+            var fileContent = fileDesc.content.toLowerCase();
+            var contentMatched = _.every(wordList, function(word) {
+                return fileContent.indexOf(word) !== -1;
+            });
+            $fileElt.toggle(titleMatched || contentMatched);
         });
         $documentListFilteredElt.removeClass('hide');
         $documentListElt.addClass('hide');
