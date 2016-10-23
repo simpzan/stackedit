@@ -501,6 +501,9 @@ define([
 			fixViewportScrolling();
 			isModalShown || editor.elt.focus();
 		});
+		mousetrap.bind('ctrl+p', function() {
+			documentPanel.toggle();
+		});
 
 		menuPanel.isOpen = false;
 		if(!window.viewerMode) {
@@ -596,7 +599,7 @@ define([
 
 		// Configure Mousetrap
 		mousetrap.stopCallback = function() {
-			return menuPanel.isOpen || documentPanel.isOpen || isModalShown;
+			return menuPanel.isOpen || isModalShown;
 		};
 
 		$(window).resize(resizeAll).focus(function() {
