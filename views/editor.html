@@ -17,6 +17,10 @@
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black">
         <meta name="msvalidate.01" content="5E47EE6F67B069C17E3CDD418351A612">
+
+        <!-- Insert this line above script imports  -->
+        <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+
         <script>
             // Use ?debug to serve original JavaScript files instead of minified
             window.baseDir = 'res';
@@ -29,6 +33,9 @@
             };
         </script>
         <script src="res-min/require.js"></script>
+
+        <!-- Insert this line after script imports -->
+        <script>if (window.module) module = window.module;</script>
     </head>
 
     <body></body>
