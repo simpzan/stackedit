@@ -494,7 +494,7 @@ define([
 		documentPanel.$elt.find('.toggle-button').click(_.bind(documentPanel.toggle, documentPanel));
 
 		// Hide panels when clicking on a non collapse element
-		documentPanel.$elt.on('click', 'a[data-toggle!=collapse]', _.bind(documentPanel.toggle, documentPanel, false));
+		// documentPanel.$elt.on('click', 'a[data-toggle!=collapse]', _.bind(documentPanel.toggle, documentPanel, false));
 
 		// Focus on editor when document panel is closed
 		documentPanel.$elt.on('hidden.layout.toggle', function() {
