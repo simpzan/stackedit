@@ -4,13 +4,14 @@ define([
 	"constants",
 	"core",
 	"utils",
+	"mousetrap",
 	"storage",
 	"settings",
 	"eventMgr",
 	"fileSystem",
 	"classes/FileDescriptor",
 	"text!WELCOME.md"
-], function($, _, constants, core, utils, storage, settings, eventMgr, fileSystem, FileDescriptor, welcomeContent) {
+], function($, _, constants, core, utils, mousetrap, storage, settings, eventMgr, fileSystem, FileDescriptor, welcomeContent) {
 
 	var fileMgr = {};
 
@@ -149,6 +150,10 @@ define([
 				$fileTitleElt.click();
 			}, 400);
 		});
+		mousetrap.bind('ctrl+n', function() {
+			$(".action-create-file").trigger('click');
+		});
+
 		$('.action-remove-file-confirm').click(function() {
 			$('.modal-remove-file-confirm').modal('show');
 		});
