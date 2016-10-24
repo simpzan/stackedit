@@ -11,9 +11,9 @@ define([
 	"extensions/yamlFrontMatterParser",
 	"extensions/markdownSectionParser",
 	"extensions/partialRendering",
-	"extensions/buttonMarkdownSyntax",
-	"extensions/googleAnalytics",
-	"extensions/twitter",
+	// "extensions/buttonMarkdownSyntax",
+	// "extensions/googleAnalytics",
+	// "extensions/twitter",
 	"extensions/dialogAbout",
 	"extensions/dialogManagePublication",
 	"extensions/dialogManageSynchronization",
@@ -33,11 +33,11 @@ define([
 	"extensions/scrollSync",
 	"extensions/buttonSync",
 	"extensions/buttonPublish",
-	"extensions/buttonStat",
-	"extensions/buttonHtmlCode",
-	"extensions/buttonViewer",
+	// "extensions/buttonStat",
+	// "extensions/buttonHtmlCode",
+	// "extensions/buttonViewer",
 	"extensions/welcomeTour",
-	"extensions/shortcuts",
+	// "extensions/shortcuts",
 	"extensions/userCustom",
 	"extensions/comments",
 	"extensions/findReplace",
@@ -217,7 +217,7 @@ define([
 	addEventHook("onCommentsChanged");
 
 	// Refresh twitter buttons
-	addEventHook("onTweet");
+	// addEventHook("onTweet");
 
 
 	var onPreviewFinished = createEventHook("onPreviewFinished");
