@@ -36,6 +36,8 @@
     "event-stream": "^3.1.7"
   },
   "scripts": {
+    "client": "open http://localhost:3000/editor?debug",
+    "server": "NO_CLUSTER=1 node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
