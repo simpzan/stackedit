@@ -56,19 +56,9 @@ exports.export = function(req, res, next) {
 		res.statusCode = 408;
 		res.end('Request timeout');
 	}
-	request({
-		uri: 'https://monetizejs.com/api/payments',
-		qs: {
-			access_token: req.query.token
-		},
-		json: true
-	}, function (err, paymentsRes, payments) {
-		var authorized = payments && payments.app == 'ESTHdCYOi18iLhhO' && (
-			(payments.chargeOption && payments.chargeOption.alias == 'once') ||
-			(payments.subscriptionOption && payments.subscriptionOption.alias == 'yearly'));
-		if(err || paymentsRes.statusCode != 200 || !authorized) {
-			return onUnauthorizedError();
-		}
+
+
+	(function() {
 		var options, params = [];
 		try {
 			options = JSON.parse(req.query.options);
@@ -141,5 +131,5 @@ exports.export = function(req, res, next) {
 			readStream.on('error', onUnknownError);
 		});
 		req.pipe(wkhtmltopdf.stdin);
-	});
+	})();
 };
