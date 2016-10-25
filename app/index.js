@@ -4,7 +4,7 @@ var compression = require('compression');
 var serveStatic = require('serve-static');
 
 // Configure ejs engine
-app.set('views', __dirname + '/../views');
+app.set('views', __dirname + '/../public/html/views');
 app.engine('html', require('ejs').renderFile);
 
 // Force HTTPS on stackedit.io
