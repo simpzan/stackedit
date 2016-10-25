@@ -571,7 +571,7 @@ define([
 				if(textContent != state.content) {
 					setValueNoWatch(state.content);
 					fileDesc.content = state.content;
-					eventMgr.onContentChanged(fileDesc, state.content);
+					onContentChanged(fileDesc, state.content);
 				}
 				selectionMgr.setSelectionStartEnd(selectionStart, selectionEnd);
 				selectionMgr.updateSelectionRange();
@@ -701,7 +701,7 @@ define([
 			}
 			fileDesc.content = textContent;
 			selectionMgr.saveSelectionState();
-			eventMgr.onContentChanged(fileDesc, textContent);
+			onContentChanged(fileDesc, textContent);
 			updateDiscussionList && eventMgr.onCommentsChanged(fileDesc);
 			undoMgr.saveState();
 			triggerSpellCheck();
@@ -719,6 +719,11 @@ define([
 			inputElt.scrollTop = scrollTop;
 			fileChanged = false;
 		}
+	}
+
+	function onContentChanged(fileDesc, newContent) {
+		fileDesc.modifyTime = new Date().getTime();
+		eventMgr.onContentChanged(fileDesc, newContent);
 	}
 
 	function adjustCommentOffsets(oldTextContent, newTextContent, discussionList) {
