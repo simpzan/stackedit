@@ -37,7 +37,7 @@
   },
   "scripts": {
     "client": "open http://localhost:3000/editor?debug",
-    "server": "NO_CLUSTER=1 node server.js",
+    "server": "NO_CLUSTER=1 node server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
