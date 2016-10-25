@@ -12,6 +12,8 @@ define([
 		this._editorEnd = parseInt(storage[fileIndex + ".editorEnd"]) || 0;
 		this._previewScrollTop = parseInt(storage[fileIndex + ".previewScrollTop"]) || 0;
 		this._selectTime = parseInt(storage[fileIndex + ".selectTime"]) || 0;
+		this._createTime = parseInt(storage[fileIndex + ".createTime"]) || new Date().getTime();
+		this._modifyTime = parseInt(storage[fileIndex + ".modifyTime"]) || new Date().getTime();
 		this._discussionList = JSON.parse(storage[fileIndex + ".discussionList"] || '{}');
 		this.syncLocations = syncLocations || {};
 		this.publishLocations = publishLocations || {};
@@ -75,6 +77,24 @@ define([
 			set: function(selectTime) {
 				this._selectTime = selectTime;
 				storage[this.fileIndex + ".selectTime"] = selectTime;
+			}
+		});
+		Object.defineProperty(this, 'modifyTime', {
+			get: function() {
+				return this._modifyTime;
+			},
+			set: function(modifyTime) {
+				this._modifyTime = modifyTime;
+				storage[this.fileIndex + ".modifyTime"] = modifyTime;
+			}
+		});
+		Object.defineProperty(this, 'createTime', {
+			get: function() {
+				return this._createTime;
+			},
+			set: function(createTime) {
+				this._createTime = createTime;
+				storage[this.fileIndex + ".createTime"] = createTime;
 			}
 		});
 		Object.defineProperty(this, 'discussionList', {
