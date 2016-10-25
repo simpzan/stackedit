@@ -501,7 +501,7 @@ define([
 			fixViewportScrolling();
 			isModalShown || editor.elt.focus();
 		});
-		mousetrap.bind('ctrl+p', function() {
+		mousetrap.bind(['ctrl+p', 'mod+p'], function() {
 			documentPanel.toggle();
 		});
 		mousetrap.bind('esc', function() {

@@ -150,7 +150,7 @@ define([
 				$fileTitleElt.click();
 			}, 400);
 		});
-		mousetrap.bind('ctrl+n', function() {
+		mousetrap.bind(['ctrl+n', 'mod+n'], function() {
 			$(".action-create-file").trigger('click');
 		});
 
