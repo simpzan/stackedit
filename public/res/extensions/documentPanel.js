@@ -44,7 +44,7 @@ define([
     var selectedFileDesc;
     var refreshPanel = _.debounce(function() {
         var documentListFilteredHtml = _.values(fileSystem).sort(function(f1, f2) {
-            return f2.selectTime - f1.selectTime;
+            return f2.modifyTime - f1.modifyTime;
         }).reduce(function(result, fileDesc) {
             return result + '<li>' + _.template(documentEltTmpl, {
                 fileDesc: fileDesc,
@@ -81,7 +81,7 @@ define([
 
         var wordList = filterValue.toLowerCase().split(/\s+/);
         filteredFiles = _.values(fileSystem).sort(function(f1, f2) {
-            return f2.selectTime - f1.selectTime;
+            return f2.modifyTime - f1.modifyTime;
         }).filter(file => {
             var title = file.title.toLowerCase();
             var titleMatched = wordList.every(word => title.indexOf(word) !== -1);
@@ -105,7 +105,9 @@ define([
         $documentListFilteredElt = $(documentListFilteredElt);
 
         // Open current folder before opening
-        $(panelElt).on('shown.layout.toggle', function() {
+        $(panelElt).on('show.layout.toggle', function() {
+            refreshPanel();
+        }).on('shown.layout.toggle', function() {
             // Scroll to the active file
             var activeElt = documentListFilteredElt.querySelector('.file.active');
             activeElt && (panelContentElt.scrollTop += activeElt.getBoundingClientRect().top - 240);
