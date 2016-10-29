@@ -9,9 +9,10 @@ define([
 		pouchdb.saveFile(fileDesc);
 	}, 1000);
 
-	function FileDescriptor(fileIndex, title, syncLocations, publishLocations) {
+	function FileDescriptor(fileIndex, title, content, syncLocations, publishLocations) {
 		this.fileIndex = fileIndex;
 		this._title = title || storage[fileIndex + ".title"];
+		this._content = content || "";
 		this._editorScrollTop = parseInt(storage[fileIndex + ".editorScrollTop"]) || 0;
 		this._editorStart = parseInt(storage[fileIndex + ".editorEnd"]) || 0;
 		this._editorEnd = parseInt(storage[fileIndex + ".editorEnd"]) || 0;
@@ -30,18 +31,17 @@ define([
 				if (this._title === title) return;
 
 				this._title = title;
-				storage[this.fileIndex + ".title"] = title;
 				saveFile(this);
 			}
 		});
 		Object.defineProperty(this, 'content', {
 			get: function() {
-				return storage[this.fileIndex + ".content"];
+				return this._content;
 			},
 			set: function(content) {
 				if (content === this.content) return;
 
-				storage[this.fileIndex + ".content"] = content;
+				this._content = content;
 				saveFile(this);
 			}
 		});

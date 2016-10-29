@@ -23,8 +23,7 @@ define([
     function loadFiles(callback) {
         pouchdb.allFiles().then(files => {
             files.forEach(f => {
-                const file = fileSystem[f._id] = new FileDescriptor(f._id, f.title);
-                file.content = f.content;
+                fileSystem[f._id] = new FileDescriptor(f._id, f.title, f.content);
             });
             console.log("fileSystem ready");
             callback(null);

@@ -80,13 +80,12 @@ define([
 			return sync + syncAttributes.syncIndex + ";";
 		}, ";");
 
-		storage[fileIndex + ".title"] = title;
-		storage[fileIndex + ".content"] = content;
 		storage[fileIndex + ".sync"] = sync;
 		storage[fileIndex + ".publish"] = ";";
 
 		// Create the file descriptor
-		var fileDesc = new FileDescriptor(fileIndex, title, syncLocations);
+		var fileDesc = new FileDescriptor(fileIndex, title, content, syncLocations);
+
 		discussionListJSON && (fileDesc.discussionListJSON = discussionListJSON);
 
 		// Add the index to the file list
