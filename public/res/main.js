@@ -204,6 +204,7 @@ require([
 	"rangy",
 	"core",
 	"eventMgr",
+	"fileSystem",
 	"synchronizer",
 	"publisher",
 	"sharing",
@@ -211,27 +212,31 @@ require([
 	"css",
 	"rangy-cssclassapplier",
 	themeModule
-], function($, rangy, core, eventMgr) {
+], function($, rangy, core, eventMgr, fileSystem) {
 
 	if(window.noStart) {
 		return;
 	}
 
 	$(function() {
-		rangy.init();
+		fileSystem.loadFiles__(function(err) {
 
-		// Here, all the modules are loaded and the DOM is ready
-		core.onReady();
+			rangy.init();
 
-		// If browser has detected a new application cache.
-		if(window.applicationCache) {
-			window.applicationCache.addEventListener('updateready', function() {
-				if(window.applicationCache.status === window.applicationCache.UPDATEREADY) {
-					window.applicationCache.swapCache();
-					eventMgr.onMessage('New version available!\nJust refresh the page to upgrade.');
-				}
-			}, false);
-		}
+			// Here, all the modules are loaded and the DOM is ready
+			core.onReady();
+
+			// If browser has detected a new application cache.
+			if(window.applicationCache) {
+				window.applicationCache.addEventListener('updateready', function() {
+					if(window.applicationCache.status === window.applicationCache.UPDATEREADY) {
+						window.applicationCache.swapCache();
+						eventMgr.onMessage('New version available!\nJust refresh the page to upgrade.');
+					}
+				}, false);
+			}
+
+		});
 	});
 
 });
