@@ -22,7 +22,7 @@ define([
 	"extensions/documentTitle",
 	"extensions/documentSelector",
 	"extensions/documentPanel",
-	"extensions/documentManager",
+	// "extensions/documentManager",
 	"extensions/workingIndicator",
 	"extensions/notifications",
 	"extensions/umlDiagrams",
