@@ -3,9 +3,8 @@ define([
     "underscore",
     "utils",
     "classes/Extension",
-    "folderList",
     "fileSystem",
-], function($, _, utils, Extension, folderList, fileSystem) {
+], function($, _, utils, Extension, fileSystem) {
 
     var documentPanel = new Extension("documentPanel", 'Document Panel');
 
