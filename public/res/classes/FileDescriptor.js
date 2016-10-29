@@ -2,7 +2,12 @@ define([
 	"underscore",
 	"utils",
 	"storage",
-], function(_, utils, storage) {
+	"pouchdb",
+], function(_, utils, storage, pouchdb) {
+
+	const saveFile = _.debounce((fileDesc) => {
+		pouchdb.saveFile(fileDesc);
+	}, 1000);
 
 	function FileDescriptor(fileIndex, title, syncLocations, publishLocations) {
 		this.fileIndex = fileIndex;
@@ -22,8 +27,11 @@ define([
 				return this._title;
 			},
 			set: function(title) {
+				if (this._title === title) return;
+
 				this._title = title;
 				storage[this.fileIndex + ".title"] = title;
+				saveFile(this);
 			}
 		});
 		Object.defineProperty(this, 'content', {
@@ -31,7 +39,10 @@ define([
 				return storage[this.fileIndex + ".content"];
 			},
 			set: function(content) {
+				if (content === this.content) return;
+
 				storage[this.fileIndex + ".content"] = content;
+				saveFile(this);
 			}
 		});
 		Object.defineProperty(this, 'editorScrollTop', {
@@ -84,8 +95,11 @@ define([
 				return this._modifyTime;
 			},
 			set: function(modifyTime) {
+				if (this._modifyTime === modifyTime) return;
+
 				this._modifyTime = modifyTime;
 				storage[this.fileIndex + ".modifyTime"] = modifyTime;
+				saveFile(this);
 			}
 		});
 		Object.defineProperty(this, 'createTime', {
