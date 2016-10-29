@@ -15,6 +15,7 @@ requirejs.config({
 		}
 	],
 	paths: {
+		pouchdb: 'bower-libs/pouchdb/dist/pouchdb',
 		jquery: 'bower-libs/jquery/jquery',
 		underscore: 'bower-libs/underscore/underscore',
 		crel: 'bower-libs/crel/crel',

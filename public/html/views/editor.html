@@ -21,7 +21,9 @@
         <!-- Insert this line above script imports  -->
         <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
+        <script src="res/bower-libs/pouchdb/dist/pouchdb.js"></script>
         <script>
+            window.PouchDB = PouchDB;
             // Use ?debug to serve original JavaScript files instead of minified
             window.baseDir = 'res';
             if (!/(\?|&)debug($|&)/.test(location.search)) {
