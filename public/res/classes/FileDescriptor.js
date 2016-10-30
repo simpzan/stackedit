@@ -132,6 +132,10 @@ define([
 		});
 	}
 
+	FileDescriptor.prototype.delete = function() {
+		return pouchdb.deleteFile(this.fileIndex);
+	};
+
 	FileDescriptor.prototype.loadAttachments = function() {
 		if (this._attachmentsLoaded) return Promise.resolve();
 

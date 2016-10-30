@@ -20,7 +20,7 @@ define([
     }
 
     function saveFile(file) {
-        return upsert(file.fileIndex, function(doc) {
+        return upsert(file.fileIndex, doc => {
             doc.title = file.title;
             doc.content = file.content;
             doc.created = file.createTime;
@@ -35,7 +35,7 @@ define([
     }
 
     function saveAttachment(fileId, attachment) {
-        return upsert(fileId, function(doc) {
+        return upsert(fileId, doc => {
             doc._attachments[attachment.name] = {
                 content_type: attachment.type,
                 data: attachment
@@ -50,11 +50,18 @@ define([
         });
     }
 
+    function deleteFile(fileId) {
+        return upsert(fileId, doc => {
+            doc._deleted = true;
+        });
+    }
+
     const pouchdb = {
         saveFile,
         allFiles,
         saveAttachment,
         loadFile,
+        deleteFile,
     };
     window.pouchdb = pouchdb;
     return pouchdb;

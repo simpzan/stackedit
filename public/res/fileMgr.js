@@ -102,26 +102,31 @@ define([
 	fileMgr.deleteFile = function(fileDesc) {
 		fileDesc = fileDesc || fileMgr.currentFile;
 
-		// Unassociate file from folder
-		if(fileDesc.folder) {
-			fileDesc.folder.removeFile(fileDesc);
-			eventMgr.onFoldersChanged();
-		}
+		fileDesc.delete().then(() => {
+			// Unassociate file from folder
+			if(fileDesc.folder) {
+				fileDesc.folder.removeFile(fileDesc);
+				eventMgr.onFoldersChanged();
+			}
 
-		// Remove the index from the file list
-		utils.removeIndexFromArray("file.list", fileDesc.fileIndex);
-		delete fileSystem[fileDesc.fileIndex];
+			// Remove the index from the file list
+			utils.removeIndexFromArray("file.list", fileDesc.fileIndex);
+			delete fileSystem[fileDesc.fileIndex];
 
-		// Don't bother with fields in localStorage, they will be removed on next page load
+			// Don't bother with fields in localStorage, they will be removed on next page load
+			if(fileMgr.currentFile === fileDesc) {
+				// Unset the current fileDesc
+				fileMgr.currentFile = undefined;
+				// Refresh the editor with another file
+				fileMgr.selectFile();
+			}
 
-		if(fileMgr.currentFile === fileDesc) {
-			// Unset the current fileDesc
-			fileMgr.currentFile = undefined;
-			// Refresh the editor with another file
-			fileMgr.selectFile();
-		}
-
-		eventMgr.onFileDeleted(fileDesc);
+			eventMgr.onFileDeleted(fileDesc);
+		}).catch(err => {
+			const hint = `failed to delete the doc ${fileDesc.title}`;
+			console.error(hint, err);
+			eventMgr.onError(hint);
+		});
 	};
 
 	// Get the file descriptor associated to a syncIndex
@@ -221,5 +226,6 @@ define([
 	});
 
 	eventMgr.onFileMgrCreated(fileMgr);
+	window.fileMgr = fileMgr;
 	return fileMgr;
 });
