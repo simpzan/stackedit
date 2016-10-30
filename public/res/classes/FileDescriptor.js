@@ -138,8 +138,7 @@ define([
 		const self = this;
 		return pouchdb.loadFile(this.fileIndex).then(doc => {
 			_.map(doc._attachments, (attachment, id) => {
-				const url = URL.createObjectURL(attachment.data);
-				self.setAttachment(id, url);
+				self.setAttachment(id, attachment.data);
 			});
 
 			self._attachmentsLoaded = true;

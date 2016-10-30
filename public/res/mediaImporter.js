@@ -53,9 +53,7 @@ define([
 
 			const currentFile = fileMgr.currentFile;
 			pouchdb.saveAttachment(currentFile.fileIndex, file).then(result => {
-				console.log("result", result);
-				const url = URL.createObjectURL(file);
-				currentFile.setAttachment(file.name, url);
+				currentFile.setAttachment(file.name, file);
 				insertLink(file.name);
 			}).catch(err => {
 				console.error("err", err);
