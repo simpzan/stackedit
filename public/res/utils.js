@@ -10,6 +10,14 @@ define([
 
 	var utils = {};
 
+	utils.mapObject = function(obj, iteratee) {
+		const result = {};
+		_.map(obj, function(value, key) {
+			result[key] = iteratee(value);
+		});
+		return result;
+	}
+
 	utils.msie = (function() {
 		/**
 		 * IE 11 changed the format of the UserAgent string.

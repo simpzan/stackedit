@@ -141,7 +141,7 @@ define([
 
 		const self = this;
 		return pouchdb.loadFile(this.fileIndex).then(doc => {
-			self.attachments = _.mapObject(doc._attachments, (attachment) => attachment.data);
+			self.attachments = utils.mapObject(doc._attachments, (attachment) => attachment.data);
 			self.attachmentsLoaded = true;
 		});
 	};
