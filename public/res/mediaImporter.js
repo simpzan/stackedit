@@ -5,8 +5,10 @@ define([
 	"classes/Provider",
 	"core",
 	"eventMgr",
+	"fileMgr",
+	"pouchdb",
 	"providers/gplusProvider"
-], function($, _, constants, Provider, core, eventMgr) {
+], function($, _, constants, Provider, core, eventMgr, fileMgr, pouchdb) {
 
 	var mediaImporter = {};
 
@@ -39,32 +41,36 @@ define([
 		function handleImgImport(evt) {
 			var files = (evt.dataTransfer || evt.target).files;
 			var file = _.first(files);
-			if(file.name.match(/.(jpe?g|png|gif)$/i)) {
-				evt.stopPropagation();
-				evt.preventDefault();
-				var reader = new FileReader();
-				reader.onload = (function(importedFile) {
-					return function(e) {
-						var content = new Uint8Array(e.target.result);
-						providerMap.gplus.uploadImage(importedFile.name, content, function(error, imageLink) {
-							if(error) {
-								return;
-							}
-							// Generate an insertLinkCallback by clicking the
-							// pagedown button but without showing the dialog
-							core.catchModal = true;
-							$("#wmd-image-button").click();
-							core.catchModal = false;
-							// Take the insertLinkCallback from core module
-							var insertLinkCallback = core.insertLinkCallback;
-							// Unset it to be sure core module will not call it
-							core.insertLinkCallback = undefined;
-							insertLinkCallback(imageLink || null);
-						});
-					};
-				})(file);
-				var blob = file.slice(0, constants.IMPORT_IMG_MAX_CONTENT_SIZE);
-				reader.readAsArrayBuffer(blob);
+			if (!file.name.match(/.(jpe?g|png|gif)$/i)) return;
+
+			evt.stopPropagation();
+			evt.preventDefault();
+
+			const limit = constants.IMPORT_IMG_MAX_CONTENT_SIZE;
+			if (file.size > limit) {
+				return console.warn(`file too large ${file.name}: ${file.size} > ${limit}`)
+			}
+
+			const currentFile = fileMgr.currentFile;
+			pouchdb.saveAttachment(currentFile.fileIndex, file).then(result => {
+				console.log("result", result);
+				insertLink(file.name);
+			}).catch(err => {
+				console.error("err", err);
+			});
+
+
+			function insertLink(imageLink) {
+				// Generate an insertLinkCallback by clicking the
+				// pagedown button but without showing the dialog
+				core.catchModal = true;
+				$("#wmd-image-button").click();
+				core.catchModal = false;
+				// Take the insertLinkCallback from core module
+				var insertLinkCallback = core.insertLinkCallback;
+				// Unset it to be sure core module will not call it
+				core.insertLinkCallback = undefined;
+				insertLinkCallback(imageLink || null);
 			}
 		}
 

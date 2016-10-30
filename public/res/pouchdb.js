@@ -34,9 +34,16 @@ define([
         });
     }
 
+    function saveAttachment(fileId, attachment) {
+        return getDocRev(fileId).then(rev => {
+            return db.putAttachment(fileId, attachment.name, rev, attachment, attachment.type);
+        });
+    }
+
     const pouchdb = {
         saveFile,
-        allFiles
+        allFiles,
+        saveAttachment,
     };
     window.pouchdb = pouchdb;
     return pouchdb;
