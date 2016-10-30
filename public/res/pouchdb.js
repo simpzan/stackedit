@@ -5,26 +5,35 @@ define([
     var db = new PouchDB('notes');
     window.db = db;
 
-    function getDocRev(id) {
-        return db.get(id).then(result => result._rev).catch(err => null);
+    function upsert(id, changeCallback) {
+        return db.get(id).then(doc => {
+            return put(doc);
+        }).catch(err => {
+            if (err.status === 404) {
+                const doc = { _id: id };
+                return put(doc);
+            } else {
+                console.error("unexpected error", err);
+                throw err;
+            }
+        });
+
+        function put(doc) {
+            doc._attachments = doc._attachments || {}
+            changeCallback(doc);
+            return db.put(doc).catch(err => {
+                console.error(`failed to put doc`, doc, err);
+                throw err;
+            });
+        }
     }
 
-    function saveFile(fileDesc) {
-        const note = {
-            _id: fileDesc.fileIndex,
-            title: fileDesc.title,
-            content: fileDesc.content,
-            created: fileDesc.createTime,
-            modified: fileDesc.modifyTime
-        };
-        console.log("saving note:", note);
-        return getDocRev(note._id).then(rev => {
-            note._rev = rev;
-            return db.put(note);
-        }).then(result => {
-            console.log(result);
-        }).catch(err => {
-            console.err(err);
+    function saveFile(file) {
+        return upsert(file.fileIndex, function(doc) {
+            doc.title = file.title;
+            doc.content = file.content;
+            doc.created = file.createTime;
+            doc.modified = file.modifyTime;
         });
     }
 
@@ -35,8 +44,11 @@ define([
     }
 
     function saveAttachment(fileId, attachment) {
-        return getDocRev(fileId).then(rev => {
-            return db.putAttachment(fileId, attachment.name, rev, attachment, attachment.type);
+        return upsert(fileId, function(doc) {
+            doc._attachments[attachment.name] = {
+                content_type: attachment.type,
+                data: attachment
+            };
         });
     }
 
