@@ -48,7 +48,7 @@ define([
 
 			const limit = constants.IMPORT_IMG_MAX_CONTENT_SIZE;
 			if (file.size > limit) {
-				return console.warn(`file too large ${file.name}: ${file.size} > ${limit}`)
+				return eventMgr.onError(`file too large ${file.name}: ${file.size} > ${limit}`)
 			}
 
 			const currentFile = fileMgr.currentFile;
@@ -61,6 +61,7 @@ define([
 				insertLink(file.name);
 			}).catch(err => {
 				console.error("err", err);
+				eventMgr.onError(`failed to save file ${file.name}: ${err}`);
 			});
 
 
