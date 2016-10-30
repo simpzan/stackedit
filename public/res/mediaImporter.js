@@ -56,8 +56,9 @@ define([
 				const hint = `there's already file named ${file.name}, please rename and try again`;
 				return eventMgr.onError(hint);
 			}
-			pouchdb.saveAttachment(currentFile.fileIndex, file).then(result => {
-				currentFile.attachments[file.name] = file;
+
+			currentFile.attachments[file.name] = file;
+			currentFile.save().then(result => {
 				insertLink(file.name);
 			}).catch(err => {
 				console.error("err", err);

@@ -136,6 +136,9 @@ define([
 		return pouchdb.deleteFile(this.fileIndex);
 	};
 
+	FileDescriptor.prototype.save = function() {
+		return pouchdb.saveFile(this);
+	};
 	FileDescriptor.prototype.loadAttachments = function() {
 		if (this.attachmentsLoaded || this.content === "") return Promise.resolve();
 

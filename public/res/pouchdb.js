@@ -1,6 +1,7 @@
 define([
     "PouchDB",
-], function(PouchDB) {
+    "utils",
+], function(PouchDB, utils) {
 
     var db = new PouchDB('notes');
     window.db = db;
@@ -25,21 +26,24 @@ define([
             doc.content = file.content;
             doc.created = file.createTime;
             doc.modified = file.modifyTime;
+
+            if (!file.attachmentsLoaded) return;
+
+            const oldAttachments = doc._attachments;
+            doc._attachments = utils.mapObject(file.attachments, (attachment, name) => {
+                const old = oldAttachments[name];
+                if (old) return old;
+                return {
+                    content_type: attachment.type,
+                    data: attachment
+                };
+            });
         });
     }
 
     function allFiles() {
         return db.allDocs({ include_docs: true }).then(result => {
             return result.rows.map(row => row.doc);
-        });
-    }
-
-    function saveAttachment(fileId, attachment) {
-        return upsert(fileId, doc => {
-            doc._attachments[attachment.name] = {
-                content_type: attachment.type,
-                data: attachment
-            };
         });
     }
 
@@ -59,7 +63,6 @@ define([
     const pouchdb = {
         saveFile,
         allFiles,
-        saveAttachment,
         loadFile,
         deleteFile,
     };
