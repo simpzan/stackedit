@@ -137,7 +137,7 @@ define([
 	};
 
 	FileDescriptor.prototype.loadAttachments = function() {
-		if (this._attachmentsLoaded) return Promise.resolve();
+		if (this._attachmentsLoaded || this.content === "") return Promise.resolve();
 
 		const self = this;
 		return pouchdb.loadFile(this.fileIndex).then(doc => {
