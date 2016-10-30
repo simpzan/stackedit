@@ -6,26 +6,17 @@ define([
     window.db = db;
 
     function upsert(id, changeCallback) {
-        return db.get(id).then(doc => {
-            return put(doc);
-        }).catch(err => {
-            if (err.status === 404) {
-                const doc = { _id: id };
-                return put(doc);
-            } else {
-                console.error("unexpected error", err);
-                throw err;
-            }
-        });
-
-        function put(doc) {
+        return db.get(id).catch(err => {
+            if (err.status !== 404) throw err;
+            return { _id: id };
+        }).then(doc => {
             doc._attachments = doc._attachments || {}
             changeCallback(doc);
-            return db.put(doc).catch(err => {
-                console.error(`failed to put doc`, doc, err);
-                throw err;
-            });
-        }
+            return db.put(doc);
+        }).catch(err => {
+            console.error(`failed to upsert doc`, err);
+            throw err;
+        });
     }
 
     function saveFile(file) {
