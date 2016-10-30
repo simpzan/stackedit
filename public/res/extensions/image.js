@@ -14,11 +14,23 @@ define([
         fileMgr = fileMgrParameter;
     };
 
+    image.onFileClosed = function(fileDesc) {
+        fileDesc.attachments = inUsingImages;
+        fileDesc.save().catch(err => {
+            console.error(`failed to save doc`, err);
+        });
+    };
+
+    var inUsingImages = {}
+
     image.onPagedownConfigure = function(editor) {
         editor.getConverter().hooks.chain("postConversion", function(html) {
+            inUsingImages = {};
+            const attachments = fileMgr.currentFile.attachments;
             var out = html.replace(/<img[^>]*src=\"(.*?)\"[^>]*>/g, function(match, url) {
-                const image = fileMgr.currentFile.attachments[url];
+                const image = attachments[url];
                 if (!image) return match;
+                inUsingImages[url] = image;
                 return match.replace(url, URL.createObjectURL(image));
             });
             return out;
