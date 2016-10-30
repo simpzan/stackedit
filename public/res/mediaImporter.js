@@ -52,7 +52,7 @@ define([
 			}
 
 			const currentFile = fileMgr.currentFile;
-			if (currentFile.attachments[file.name]) {
+			if (currentFile.activeAttachments[file.name]) {
 				const hint = `there's already file named ${file.name}, please rename and try again`;
 				return eventMgr.onError(hint);
 			}
