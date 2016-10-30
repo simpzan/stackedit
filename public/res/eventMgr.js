@@ -42,6 +42,7 @@ define([
 	// "extensions/comments",
 	"extensions/findReplace",
 	"extensions/htmlSanitizer",
+	"extensions/image",
 	"bootstrap",
 	"jquery-waitforimages"
 ], function($, _, crel, mousetrap, utils, logger, Extension, settings, settingsExtensionsAccordionHTML) {

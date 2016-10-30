@@ -20,6 +20,7 @@ define([
 		this._selectTime = parseInt(storage[fileIndex + ".selectTime"]) || 0;
 		this._createTime = parseInt(storage[fileIndex + ".createTime"]) || new Date().getTime();
 		this._modifyTime = parseInt(storage[fileIndex + ".modifyTime"]) || new Date().getTime();
+		this._attachments = {};
 		this._discussionList = JSON.parse(storage[fileIndex + ".discussionList"] || '{}');
 		this.syncLocations = syncLocations || {};
 		this.publishLocations = publishLocations || {};
@@ -130,6 +131,13 @@ define([
 			}
 		});
 	}
+
+	FileDescriptor.prototype.getAttachment = function(attachmentId) {
+		return this._attachments[attachmentId];
+	};
+	FileDescriptor.prototype.setAttachment = function(attachmentId, attachment) {
+		this._attachments[attachmentId] = attachment;
+	};
 
 	FileDescriptor.prototype.addSyncLocation = function(syncAttributes) {
 		utils.storeAttributes(syncAttributes);
