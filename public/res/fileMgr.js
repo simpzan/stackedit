@@ -36,19 +36,21 @@ define([
 			}
 		}
 
-		if(fileMgr.currentFile !== fileDesc) {
-			fileMgr.currentFile = fileDesc;
-			fileDesc.selectTime = new Date().getTime();
+		fileDesc.loadAttachments().then(() => {
+			if(fileMgr.currentFile !== fileDesc) {
+				fileMgr.currentFile = fileDesc;
+				fileDesc.selectTime = new Date().getTime();
 
-			// Notify extensions
-			eventMgr.onFileSelected(fileDesc);
+				// Notify extensions
+				eventMgr.onFileSelected(fileDesc);
 
-			// Hide the viewer pencil button
-			$(".action-edit-document").toggleClass("hide", fileDesc.fileIndex != constants.TEMPORARY_FILE_INDEX);
-		}
+				// Hide the viewer pencil button
+				$(".action-edit-document").toggleClass("hide", fileDesc.fileIndex != constants.TEMPORARY_FILE_INDEX);
+			}
 
-		// Refresh the editor (even if it's the same file)
-		core.initEditor(fileDesc);
+			// Refresh the editor (even if it's the same file)
+			core.initEditor(fileDesc);
+		});
 	};
 
 	fileMgr.createFile = function(title, content, discussionListJSON, syncLocations, isTemporary) {

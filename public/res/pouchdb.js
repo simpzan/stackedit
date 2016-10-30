@@ -52,10 +52,18 @@ define([
         });
     }
 
+    function loadFile(fileId) {
+        return db.get(fileId, { attachments: true, binary: true }).catch(err => {
+            console.error("failed to loadFile", err);
+            throw err;
+        });
+    }
+
     const pouchdb = {
         saveFile,
         allFiles,
         saveAttachment,
+        loadFile,
     };
     window.pouchdb = pouchdb;
     return pouchdb;

@@ -132,6 +132,20 @@ define([
 		});
 	}
 
+	FileDescriptor.prototype.loadAttachments = function() {
+		if (this._attachmentsLoaded) return Promise.resolve();
+
+		const self = this;
+		return pouchdb.loadFile(this.fileIndex).then(doc => {
+			_.map(doc._attachments, (attachment, id) => {
+				const url = URL.createObjectURL(attachment.data);
+				self.setAttachment(id, url);
+			});
+
+			self._attachmentsLoaded = true;
+		});
+	};
+
 	FileDescriptor.prototype.getAttachment = function(attachmentId) {
 		return this._attachments[attachmentId];
 	};
