@@ -52,12 +52,12 @@ define([
 			}
 
 			const currentFile = fileMgr.currentFile;
-			if (currentFile.getAttachment(file.name)) {
+			if (currentFile.attachments[file.name]) {
 				const hint = `there's already file named ${file.name}, please rename and try again`;
 				return eventMgr.onError(hint);
 			}
 			pouchdb.saveAttachment(currentFile.fileIndex, file).then(result => {
-				currentFile.setAttachment(file.name, file);
+				currentFile.attachments[file.name] = file;
 				insertLink(file.name);
 			}).catch(err => {
 				console.error("err", err);

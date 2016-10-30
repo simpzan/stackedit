@@ -20,7 +20,7 @@ define([
 		this._selectTime = parseInt(storage[fileIndex + ".selectTime"]) || 0;
 		this._createTime = parseInt(storage[fileIndex + ".createTime"]) || new Date().getTime();
 		this._modifyTime = parseInt(storage[fileIndex + ".modifyTime"]) || new Date().getTime();
-		this._attachments = {};
+		this.attachments = {};
 		this._discussionList = JSON.parse(storage[fileIndex + ".discussionList"] || '{}');
 		this.syncLocations = syncLocations || {};
 		this.publishLocations = publishLocations || {};
@@ -137,23 +137,13 @@ define([
 	};
 
 	FileDescriptor.prototype.loadAttachments = function() {
-		if (this._attachmentsLoaded || this.content === "") return Promise.resolve();
+		if (this.attachmentsLoaded || this.content === "") return Promise.resolve();
 
 		const self = this;
 		return pouchdb.loadFile(this.fileIndex).then(doc => {
-			_.map(doc._attachments, (attachment, id) => {
-				self.setAttachment(id, attachment.data);
-			});
-
-			self._attachmentsLoaded = true;
+			self.attachments = _.mapObject(doc._attachments, (attachment) => attachment.data);
+			self.attachmentsLoaded = true;
 		});
-	};
-
-	FileDescriptor.prototype.getAttachment = function(attachmentId) {
-		return this._attachments[attachmentId];
-	};
-	FileDescriptor.prototype.setAttachment = function(attachmentId, attachment) {
-		this._attachments[attachmentId] = attachment;
 	};
 
 	FileDescriptor.prototype.addSyncLocation = function(syncAttributes) {

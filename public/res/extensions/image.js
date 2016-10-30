@@ -17,7 +17,7 @@ define([
     image.onPagedownConfigure = function(editor) {
         editor.getConverter().hooks.chain("postConversion", function(html) {
             var out = html.replace(/<img[^>]*src=\"(.*?)\"[^>]*>/g, function(match, url) {
-                const image = fileMgr.currentFile.getAttachment(url);
+                const image = fileMgr.currentFile.attachments[url];
                 if (!image) return match;
                 return match.replace(url, URL.createObjectURL(image));
             });
