@@ -15,7 +15,13 @@ define([
     };
 
     image.onFileClosed = function(fileDesc) {
-        fileDesc.attachments = fileDesc.activeAttachments;
+        if (fileDesc.deleted) return;
+
+        const active = fileDesc.activeAttachments;
+        const diff = _.difference(Object.keys(fileDesc.attachments), Object.keys(active));
+        if (diff.length === 0) return;
+
+        fileDesc.attachments = active;
         fileDesc.save().catch(err => {
             console.error(`failed to save doc`, err);
         });

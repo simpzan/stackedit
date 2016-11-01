@@ -133,7 +133,11 @@ define([
 	}
 
 	FileDescriptor.prototype.delete = function() {
-		return pouchdb.deleteFile(this.fileIndex);
+		const self = this;
+		return pouchdb.deleteFile(this.fileIndex).then(result => {
+			self.deleted = true;
+			return result;
+		});
 	};
 
 	FileDescriptor.prototype.save = function() {
