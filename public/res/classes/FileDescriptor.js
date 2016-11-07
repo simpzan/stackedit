@@ -147,6 +147,8 @@ define([
 		return pouchdb.loadFile(this.fileIndex).then(doc => {
 			self.attachments = utils.mapObject(doc._attachments, (attachment) => attachment.data);
 			self.attachmentsLoaded = true;
+		}).catch(err => {
+			console.error(`failed to loadAttachments`);
 		});
 	};
 
