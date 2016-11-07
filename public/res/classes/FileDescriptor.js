@@ -133,11 +133,8 @@ define([
 	}
 
 	FileDescriptor.prototype.delete = function() {
-		const self = this;
-		return pouchdb.deleteFile(this).then(result => {
-			self.deleted = true;
-			return result;
-		});
+		this.deleted = true;
+		return pouchdb.saveFile(this);
 	};
 
 	FileDescriptor.prototype.save = function() {
@@ -152,6 +149,38 @@ define([
 			self.attachmentsLoaded = true;
 		});
 	};
+
+	FileDescriptor.fromDocument = function(doc) {
+        const file = new FileDescriptor(doc._id, doc.title, doc.content);
+        file._rev = doc._rev;
+        file._attachments = doc._attachments;
+        return file;
+	}
+	FileDescriptor.prototype.toDocument = function() {
+		const doc = {
+			_id: this.fileIndex,
+			_rev: this._rev,
+			_deleted: this.deleted,
+			_attachments: this._attachments,
+			title: this.title,
+			content: this.content,
+			created: this.createTime,
+			modified: this.modifyTime
+		};
+
+        if (this.attachmentsLoaded) {
+	        const oldAttachments = this._attachments;
+	        doc._attachments = utils.mapObject(this.attachments, (attachment, name) => {
+	            const old = oldAttachments[name];
+	            if (old) return old;
+	            return {
+	                content_type: attachment.type,
+	                data: attachment
+	            };
+	        });
+        }
+		return doc;
+	}
 
 	FileDescriptor.prototype.addSyncLocation = function(syncAttributes) {
 		utils.storeAttributes(syncAttributes);
