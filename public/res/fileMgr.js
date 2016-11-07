@@ -9,9 +9,10 @@ define([
 	"settings",
 	"eventMgr",
 	"fileSystem",
+	"pouchdb",
 	"classes/FileDescriptor",
 	"text!WELCOME.md"
-], function($, _, constants, core, utils, mousetrap, storage, settings, eventMgr, fileSystem, FileDescriptor, welcomeContent) {
+], function($, _, constants, core, utils, mousetrap, storage, settings, eventMgr, fileSystem, pouchdb, FileDescriptor, welcomeContent) {
 
 	var fileMgr = {};
 
@@ -142,6 +143,27 @@ define([
 			return _.has(fileDesc.publishLocations, publishIndex);
 		});
 	};
+
+	mousetrap.bind("ctrl+s", function() {
+        const handler = pouchdb.sync();
+        handler.on('change', change => {
+            console.log("change", change)
+            const doc = change.doc;
+            if (doc._deleted) {
+            	delete fileSystem[doc._id];
+            } else {
+            	const file = FileDescriptor.fromDocument(doc);
+            	fileSystem[doc._id] = file;
+            }
+            if (fileMgr.currentFile.fileIndex === doc._id) {
+                fileMgr.currentFile = undefined;
+                fileMgr.selectFile();
+            }
+            if (doc._conflicts && doc._conflicts.length > 0) {
+                console.log("conflicts", doc)
+            }
+        });
+   	});
 
 	eventMgr.addListener("onReady", function() {
 		var $editorElt = $("#wmd-input");
