@@ -54,8 +54,8 @@ define([
         });
     }
 
-    function deleteFile(fileId) {
-        return upsert(fileId, doc => {
+    function deleteFile(f) {
+        return upsert(f.fileIndex, doc => {
             doc._deleted = true;
         });
     }
