@@ -169,13 +169,10 @@ define([
 		var $editorElt = $("#wmd-input");
 		fileMgr.selectFile();
 
-		var $fileTitleElt = $('.file-title-navbar');
-		var $fileTitleInputElt = $(".input-file-title");
 		$(".action-create-file").click(function() {
 			setTimeout(function() {
 				var fileDesc = fileMgr.createFile();
 				fileMgr.selectFile(fileDesc);
-				$fileTitleElt.click();
 			}, 400);
 		});
 		mousetrap.bind(['ctrl+n', 'mod+n'], function() {
@@ -187,49 +184,6 @@ define([
 		});
 		$(".action-remove-file").click(function() {
 			fileMgr.deleteFile();
-		});
-		var titleEditing;
-		$fileTitleElt.click(function() {
-			if(window.viewerMode === true) {
-				return;
-			}
-			$fileTitleElt.addClass('hide');
-			var fileTitleInput = $fileTitleInputElt.removeClass('hide');
-			titleEditing = true;
-			setTimeout(function() {
-				fileTitleInput.focus().get(0).select();
-			}, 10);
-		});
-		function applyTitle() {
-			if(!titleEditing) {
-				return;
-			}
-			$fileTitleInputElt.addClass('hide');
-			$fileTitleElt.removeClass('hide');
-			var title = $.trim($fileTitleInputElt.val());
-			var fileDesc = fileMgr.currentFile;
-			if(title && title != fileDesc.title) {
-				fileDesc.title = title;
-				eventMgr.onTitleChanged(fileDesc);
-			}
-			$fileTitleInputElt.val(fileDesc.title);
-			$editorElt.focus();
-			titleEditing = false;
-		}
-
-		$fileTitleInputElt.blur(function() {
-			setTimeout(function() {
-				applyTitle();
-			}, 0);
-		}).keypress(function(e) {
-			if(e.keyCode == 13) {
-				applyTitle();
-				e.preventDefault();
-			}
-			if(e.keyCode == 27) {
-				$fileTitleInputElt.val("");
-				applyTitle();
-			}
 		});
 		$(".action-open-stackedit").click(function() {
 			window.location.href = "editor";

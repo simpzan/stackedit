@@ -26,13 +26,10 @@ define([
 		this.publishLocations = publishLocations || {};
 		Object.defineProperty(this, 'title', {
 			get: function() {
-				return this._title;
+				return this.content.substring(0, 254).split('\n')[0].trim();
 			},
 			set: function(title) {
-				if (this._title === title) return;
-
-				this._title = title;
-				saveFile(this);
+				console.error("title property is deprecated, use #Title in markdown file instead");
 			}
 		});
 		Object.defineProperty(this, 'content', {
