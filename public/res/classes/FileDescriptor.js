@@ -5,9 +5,12 @@ define([
 	"pouchdb",
 ], function(_, utils, storage, pouchdb) {
 
-	const saveFile = _.debounce((fileDesc) => {
+	const saveFileDebounced = _.debounce((fileDesc) => {
 		pouchdb.saveFile(fileDesc);
-	}, 1000);
+	}, 5000);
+	function saveFile(f) {
+		saveFileDebounced(f);
+	}
 
 	function FileDescriptor(fileIndex, title, content, syncLocations, publishLocations) {
 		this.fileIndex = fileIndex;
@@ -30,6 +33,15 @@ define([
 			},
 			set: function(title) {
 				console.error("title property is deprecated, use #Title in markdown file instead");
+			}
+		});
+		Object.defineProperty(this, 'currentRev', {
+			get: function() {
+				this._currentRevIndex = this._currentRevIndex || 0
+				return this._revs[this._currentRevIndex];
+			},
+			set: function(rev) {
+				this._revs[this._currentRevIndex] = rev;
 			}
 		});
 		Object.defineProperty(this, 'content', {
@@ -129,6 +141,11 @@ define([
 		});
 	}
 
+	FileDescriptor.prototype.selectRev = function(rev) {
+		const index = this._revs.indexOf(rev);
+		if (index === -1) throw new Error(`invalid rev: ${rev}`)
+		this._currentRevIndex = index;
+	};
 	FileDescriptor.prototype.delete = function() {
 		this.deleted = true;
 		return pouchdb.saveFile(this);
@@ -138,12 +155,13 @@ define([
 		return pouchdb.saveFile(this);
 	};
 	FileDescriptor.prototype.loadAttachments = function() {
-		if (this.attachmentsLoaded || this.content === "") return Promise.resolve();
+		if (this.content === "") return Promise.resolve();
 
 		const self = this;
-		return pouchdb.loadFile(this.fileIndex).then(doc => {
+		return pouchdb.loadFile(this.fileIndex, this.currentRev).then(doc => {
 			self.attachments = utils.mapObject(doc._attachments, (attachment) => attachment.data);
 			self.attachmentsLoaded = true;
+			self._content = doc.content;
 		}).catch(err => {
 			console.error(`failed to loadAttachments`);
 		});
@@ -151,14 +169,17 @@ define([
 
 	FileDescriptor.fromDocument = function(doc) {
         const file = new FileDescriptor(doc._id, doc.title, doc.content);
+        file._id = doc._id;
         file._rev = doc._rev;
         file._attachments = doc._attachments;
+        doc._conflicts = doc._conflicts || [];
+        file._revs = [doc._rev].concat(doc._conflicts);
         return file;
 	}
 	FileDescriptor.prototype.toDocument = function() {
 		const doc = {
-			_id: this.fileIndex,
-			_rev: this._rev,
+			_id: this._id,
+			_rev: this.currentRev,
 			_deleted: this.deleted,
 			_attachments: this._attachments,
 			title: this.title,

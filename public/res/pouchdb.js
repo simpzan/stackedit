@@ -7,8 +7,10 @@ define([
     window.db = db;
 
     function saveFile(file) {
-        return db.put(file.toDocument()).then(result => {
-            file._rev = result.rev;
+        const doc = file.toDocument();
+        console.info("saveFile", doc);
+        return db.put(doc, {force:true}).then(result => {
+            file.currentRev = result.rev;
             return result;
         });
     }
@@ -19,8 +21,8 @@ define([
         });
     }
 
-    function loadFile(fileId) {
-        return db.get(fileId, { attachments: true, binary: true }).catch(err => {
+    function loadFile(fileId, rev) {
+        return db.get(fileId, { rev, attachments: true, binary: true }).catch(err => {
             console.error("failed to loadFile", err);
             throw err;
         });

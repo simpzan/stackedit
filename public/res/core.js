@@ -219,7 +219,9 @@ define([
 
 		if(pagedownEditor !== undefined) {
 			// If the editor is already created
-			editor.undoMgr.init();
+			editor.watcher.noWatch(function() {
+				editor.undoMgr.init();
+			});
 			return pagedownEditor.uiManager.setUndoRedoButtonStates();
 		}
 
