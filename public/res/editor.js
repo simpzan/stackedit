@@ -638,7 +638,7 @@ define([
 			lastMode = undefined;
 			contentElt.textContent = content;
 			// Force this since the content could be the same
-			checkContentChange();
+			// checkContentChange();
 		};
 	}
 
